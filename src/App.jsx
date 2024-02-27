@@ -1,7 +1,7 @@
-const App = () => {
-  return (
-    <div>App</div>
-  )
-}
+import TextEditor from "./components/TextEditor";
 
-export default App
+const App = () => {
+  return <TextEditor />;
+};
+
+export default App;
