@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -7,15 +6,42 @@ import {
 } from "react-router-dom";
 
 import TextEditor from "./components/TextEditor";
-import {v4 as uuidV4} from 'uuid'
-const RedirectComponent = () => {
-  const navigate = useNavigate();
-  useEffect(() => {
-    navigate(`/documents/${uuidV4()}`);
-  });
+import { useState } from "react";
+function generateRoomId() {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < 4; i++) {
+     result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+ }
 
-  return null;
-};
+ 
+const RedirectComponent = () => {
+  const [code, setCode] = useState("");
+  const navigate = useNavigate();
+ 
+  const redirect = () => {
+    navigate(`/documents/${generateRoomId()}`);
+  }
+  return (
+    <>
+      <input 
+        type="text"
+        placeholder="enter code: "
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+      />
+      <button onClick={() => {navigate(`/documents/${code}`)}}>
+        Go
+      </button>
+      <button onClick={redirect}>
+        Create New 
+      </button>
+    </>
+  );
+ };
+ 
 
 const App = () => {
   return (

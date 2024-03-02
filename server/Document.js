@@ -1,10 +1,9 @@
-// Document.js
+const mongoose = require("mongoose");
 
-const { Schema, model } = require("mongoose");
-
-const Document = new Schema({
-  _id: String,
-  data: Object,
+const DocumentSchema = new mongoose.Schema({
+ _id: String,
+ data: Object,
+ owner: String, // Store the username of the document's owner
 });
 
-module.exports = model("Document", Document);
+module.exports = mongoose.model("Document", DocumentSchema);
