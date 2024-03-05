@@ -2,16 +2,15 @@ import { useCallback, useEffect, useState } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import { io } from "socket.io-client";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const SAVE_INTERVAL_MS = 2000;
-const TOOLBAR_OPTIONS = [["image"]];
 
 export default function TextEditor() {
- const { id: documentId } = useParams();
- const [socket, setSocket] = useState();
- const [quill, setQuill] = useState();
- const [username, setUsername] = useState(() => {
+  const { id: documentId } = useParams();
+  const [socket, setSocket] = useState();
+  const [quill, setQuill] = useState();
+  const [username, setUsername] = useState(() => {
     const storedUsername = localStorage.getItem("username");
     if (!storedUsername) {
       const newUsername = prompt("Please enter your username:");
@@ -19,22 +18,32 @@ export default function TextEditor() {
         localStorage.setItem("username", newUsername);
         return newUsername;
       }
-    }
+    } 
     return storedUsername;
- });
+  });
 
- useEffect(() => {
+  const options = {
+    debug: 'info',
+    modules: {
+      toolbar: false,
+    },
+    placeholder: 'Write Something...',
+    theme: 'bubble'
+  };
+
+  useEffect(() => {
     const s = io("http://localhost:3001");
     setSocket(s);
 
     return () => {
       s.disconnect();
     };
- }, []);
+  }, []);
 
- useEffect(() => {
+  const [isEditable, setIsEditable] = useState(true);
+  const [cursor, setCursor] = useState(0);
+  useEffect(() => {
     if (socket == null || quill == null) return;
-
     socket.once("load-document", (document) => {
       quill.setContents(document.data);
       if (document.isEditable) {
@@ -44,22 +53,26 @@ export default function TextEditor() {
       }
     });
 
-    socket.emit("get-document", documentId, username);
- }, [socket, quill, documentId, username]);
+    socket.emit("get-document", documentId, username, isEditable);
+  }, [socket, quill, documentId, username]);
 
- useEffect(() => {
+  useEffect(() => {
     if (socket == null || quill == null) return;
 
     const interval = setInterval(() => {
+      const range = quill.getSelection();
+      if (range && range.length === 0) {
+        setCursor(range.index);
+      }
       socket.emit("save-document", quill.getContents(), username);
     }, SAVE_INTERVAL_MS);
 
     return () => {
       clearInterval(interval);
     };
- }, [socket, quill, username]);
+  }, [socket, quill, username]);
 
- useEffect(() => {
+  useEffect(() => {
     if (socket == null || quill == null) return;
 
     const handler = (delta) => {
@@ -71,9 +84,9 @@ export default function TextEditor() {
     return () => {
       socket.off("receive-changes", handler);
     };
- }, [socket, quill]);
+  }, [socket, quill]);
 
- useEffect(() => {
+  useEffect(() => {
     if (socket == null || quill == null) return;
 
     const handler = (delta, oldDelta, source) => {
@@ -82,20 +95,24 @@ export default function TextEditor() {
     };
 
     quill.on("text-change", handler);
-
+    const range = quill.getSelection();
+    if (range && range.length === 0) {
+      setCursor(range.index);
+    }
     return () => {
       quill.off("text-change", handler);
     };
- }, [socket, quill, username]);
+  }, [socket, quill, username]);
 
- useEffect(() => {
+  useEffect(() => {
     if (socket == null || quill == null) return;
 
     const handler = (generatedText) => {
-      const range = quill.getSelection();
-      if (range && range.length === 0) {
-        quill.insertText(range.index, generatedText);
-      }
+      // const range = quill.getSelection();
+      // if (range && range.length === 0) {
+      // }
+      console.log("cursor", cursor);
+      quill.insertText(cursor, generatedText);
     };
 
     socket.on("receive-generated-text", handler);
@@ -103,31 +120,29 @@ export default function TextEditor() {
     return () => {
       socket.off("receive-generated-text", handler);
     };
- }, [socket, quill]);
+  }, [socket, quill, cursor]);
 
- const wrapperRef = useCallback((wrapper) => {
+  const wrapperRef = useCallback((wrapper) => {
     if (wrapper == null) return;
 
     wrapper.innerHTML = "";
     const editor = document.createElement("div");
     wrapper.append(editor);
-    const q = new Quill(editor, {
-      theme: "snow",
-      modules: { toolbar: TOOLBAR_OPTIONS },
-    });
+    const q = new Quill(editor, options);
     q.disable();
-    q.setText("Loading...");
     setQuill(q);
- }, []);
+  }, []);
 
- const [textModal, setTextModal] = useState(false);
- const writePrompt = () => {
+  const [textModal, setTextModal] = useState(false);
+  const writePrompt = () => {
     setTextModal(!textModal);
- };
+  };
 
- const [text, setText] = useState("");
+  const [text, setText] = useState("");
 
- const apiCall = async () => {
+  const apiCall = async () => {
+    quill.enable(false);
+    // setLoading(true)
     try {
       const response = await fetch("http://localhost:3001/generate-text", {
         method: "POST",
@@ -139,40 +154,68 @@ export default function TextEditor() {
 
       const result = await response.json();
       const generatedText = result.response;
-
+      console.log(generatedText);
       if (quill) {
-        const range = quill.getSelection();
-        if (range && range.length === 0) {
-          quill.insertText(range.index, generatedText);
-
-          // Emit changes to other users
-          socket.emit("send-generated-text", generatedText, username);
-        }
+        console.log("cursor", cursor);
+        quill.insertText(cursor, generatedText);
+        socket.emit("send-generated-text", generatedText, username);
       }
-
       setTextModal(false);
+      setText("");
     } catch (error) {
       console.error(error);
     }
- };
+    // setLoading(false)
+    quill.enable(true);
+  };
 
- return (
-    <>
-      <h2>
-        Username: {username} | Room ID: {documentId}
-      </h2>
-      <button onClick={writePrompt}>Help me write</button>
+  const navigate = useNavigate();
+const handleCheckboxChange = () => {} 
+  const [loading, setLoading] = useState(false);
+  return (
+    <div className="textEditor_container">
+      <div className="textEditor_navigation">
+       
+        <h1 className="textEditor_title" onClick={() => navigate("/")}>Sync</h1>
+       
+      </div>
+      <div className="nav">
+        <h3>Room code: {documentId}</h3>
+        <button onClick={writePrompt} className="btn2">
+          Help me write
+        </button>
+      </div>
       {textModal && (
-        <div>
+        <div className="textModal">
           <input
             type="textarea"
             value={text}
+            className="modalText"
             onChange={(e) => setText(e.target.value)}
+            placeholder="Write a email to manager for sick leave...."
           />
-          <button onClick={apiCall}>Write</button>
+          <button onClick={apiCall} className="btn">
+            Write
+          </button>
         </div>
       )}
-      <div className="container" ref={wrapperRef}></div>
-    </>
- );
+       {/* <label>
+            Allow everyone to edit this document
+            <input
+              type="checkbox"
+              checked={isEditable === null ? false : isEditable}
+              onChange={handleCheckboxChange}
+            />
+          </label> */}
+      {loading ? (
+        <div className="container">
+          <h5 style={{
+            margin:"1rem"
+          }}>Generating....</h5>
+        </div>
+      ) : (
+        <div className="container" ref={wrapperRef}></div>
+      )}
+    </div>
+  );
 }
