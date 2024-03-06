@@ -4,8 +4,7 @@ import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import { io } from "socket.io-client";
 import { useNavigate, useParams } from "react-router-dom";
-import { usePermission } from '../context/PermissionContext';
-
+import { usePermission } from "../context/PermissionContext";
 
 const SAVE_INTERVAL_MS = 2000;
 
@@ -37,7 +36,7 @@ export default function TextEditor() {
   };
 
   useEffect(() => {
-    const s =io('http://localhost:3001');
+    const s = io("http://localhost:3001");
     setSocket(s);
 
     return () => {
@@ -51,7 +50,7 @@ export default function TextEditor() {
   useEffect(() => {
     if (socket == null || quill == null) return;
     socket.once("load-document", (document) => {
-      setOwner(document.owner)
+      setOwner(document.owner);
       quill.setContents(document.data);
       if (document.isEditable) {
         quill.enable(true);
@@ -95,23 +94,22 @@ export default function TextEditor() {
 
   useEffect(() => {
     if (socket == null || quill == null) return;
-  
+
     const handler = (delta, oldDelta, source) => {
       if (source !== "user") return;
       socket.emit("send-changes", delta, username);
     };
-  
+
     quill.on("text-change", handler);
     const range = quill.getSelection();
     if (range && range.length === 0) {
       setCursor(range.index);
     }
-  
+
     return () => {
       quill.off("text-change", handler);
     };
   }, [socket, quill, username]);
-  
 
   useEffect(() => {
     if (socket == null || quill == null) return;
@@ -184,10 +182,10 @@ export default function TextEditor() {
   // function handleCheckboxChange(event) {
   //   setIsEditable(event.target.checked);
   // }
-  
+
   // useEffect(() => {
   //   if (socket == null || quill == null) return;
-  
+
   //   const handleEditableChange = (isEditable) => {
   //     setIsEditable(isEditable);
   //     if (isEditable || username === owner) {
@@ -196,18 +194,17 @@ export default function TextEditor() {
   //       quill.disable();
   //     }
   //   };
-  
+
   //   socket.on("editable-change", handleEditableChange);
-  
+
   //   return () => {
   //     socket.off("editable-change", handleEditableChange);
   //   };
   // }, [socket, quill, username, owner, isEditable]);
-    
 
   const navigate = useNavigate();
 
-  console.log('username', username, 'owner', owner);
+  console.log("username", username, "owner", owner);
   return (
     <div className="textEditor_container">
       <div className="textEditor_navigation">
@@ -217,9 +214,11 @@ export default function TextEditor() {
       </div>
       <div className="nav">
         <h3>Room code: {documentId}</h3>
-        <button onClick={writePrompt} className="btn2">
-          Help me write
-        </button>
+        {(permission || username === owner) && (
+          <button onClick={writePrompt} className="btn2">
+            Help me write
+          </button>
+        )}
       </div>
       {/* {username === owner && (
         <div className="nav2">

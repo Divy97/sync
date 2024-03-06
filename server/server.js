@@ -69,13 +69,17 @@ io.on("connection", (socket) => {
 app.post("/generate-text", async (req, res) => {
   try {
     const { text } = req.body;
+    if (!text) {
+      throw new Error("Text is required");
+    }
     const response = await createNonStreamingMultipartContent(text);
-    res.status(200).json({ status: "success", response: response });
+    res.status(200).json({ status: "success", response });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Something went wrong" });
   }
 });
+
 
 server.listen(3001, () => {
   console.log("Server running on port 3001");
