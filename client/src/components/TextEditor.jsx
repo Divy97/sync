@@ -1,12 +1,17 @@
+/* eslint-disable no-unused-vars */
 import { useCallback, useEffect, useState } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import { io } from "socket.io-client";
 import { useNavigate, useParams } from "react-router-dom";
+import { usePermission } from '../context/PermissionContext';
+
 
 const SAVE_INTERVAL_MS = 2000;
 
 export default function TextEditor() {
+  const { permission } = usePermission();
+
   const { id: documentId } = useParams();
   const [socket, setSocket] = useState();
   const [quill, setQuill] = useState();
@@ -18,17 +23,17 @@ export default function TextEditor() {
         localStorage.setItem("username", newUsername);
         return newUsername;
       }
-    } 
+    }
     return storedUsername;
   });
 
   const options = {
-    debug: 'info',
+    debug: "info",
     modules: {
       toolbar: false,
     },
-    placeholder: 'Write Something...',
-    theme: 'bubble'
+    placeholder: "Write Something...",
+    theme: "bubble",
   };
 
   useEffect(() => {
@@ -40,21 +45,23 @@ export default function TextEditor() {
     };
   }, []);
 
-  const [isEditable, setIsEditable] = useState(true);
+  const [owner, setOwner] = useState("");
+  const [isEditable, setIsEditable] = useState(permission);
   const [cursor, setCursor] = useState(0);
   useEffect(() => {
     if (socket == null || quill == null) return;
     socket.once("load-document", (document) => {
+      setOwner(document.owner)
       quill.setContents(document.data);
       if (document.isEditable) {
-        quill.enable();
+        quill.enable(true);
       } else {
         quill.enable(username === document.owner);
       }
     });
 
     socket.emit("get-document", documentId, username, isEditable);
-  }, [socket, quill, documentId, username]);
+  }, [socket, quill, documentId, username, isEditable]);
 
   useEffect(() => {
     if (socket == null || quill == null) return;
@@ -88,21 +95,23 @@ export default function TextEditor() {
 
   useEffect(() => {
     if (socket == null || quill == null) return;
-
+  
     const handler = (delta, oldDelta, source) => {
       if (source !== "user") return;
       socket.emit("send-changes", delta, username);
     };
-
+  
     quill.on("text-change", handler);
     const range = quill.getSelection();
     if (range && range.length === 0) {
       setCursor(range.index);
     }
+  
     return () => {
       quill.off("text-change", handler);
     };
   }, [socket, quill, username]);
+  
 
   useEffect(() => {
     if (socket == null || quill == null) return;
@@ -169,15 +178,42 @@ export default function TextEditor() {
     quill.enable(true);
   };
 
-  const navigate = useNavigate();
-const handleCheckboxChange = () => {} 
   const [loading, setLoading] = useState(false);
+
+  // const navigate = useNavigate();
+  // function handleCheckboxChange(event) {
+  //   setIsEditable(event.target.checked);
+  // }
+  
+  // useEffect(() => {
+  //   if (socket == null || quill == null) return;
+  
+  //   const handleEditableChange = (isEditable) => {
+  //     setIsEditable(isEditable);
+  //     if (isEditable || username === owner) {
+  //       quill.enable();
+  //     } else {
+  //       quill.disable();
+  //     }
+  //   };
+  
+  //   socket.on("editable-change", handleEditableChange);
+  
+  //   return () => {
+  //     socket.off("editable-change", handleEditableChange);
+  //   };
+  // }, [socket, quill, username, owner, isEditable]);
+    
+
+  const navigate = useNavigate();
+
+  console.log('username', username, 'owner', owner);
   return (
     <div className="textEditor_container">
       <div className="textEditor_navigation">
-       
-        <h1 className="textEditor_title" onClick={() => navigate("/")}>Sync</h1>
-       
+        <h1 className="textEditor_title" onClick={() => navigate("/")}>
+          Sync
+        </h1>
       </div>
       <div className="nav">
         <h3>Room code: {documentId}</h3>
@@ -185,6 +221,16 @@ const handleCheckboxChange = () => {}
           Help me write
         </button>
       </div>
+      {/* {username === owner && (
+        <div className="nav2">
+          <label>Allow everyone to edit this document</label>
+          <input
+            type="checkbox"
+            checked={isEditable === null ? false : isEditable}
+            onChange={handleCheckboxChange}
+          />
+        </div>
+      )} */}
       {textModal && (
         <div className="textModal">
           <input
@@ -199,19 +245,15 @@ const handleCheckboxChange = () => {}
           </button>
         </div>
       )}
-       {/* <label>
-            Allow everyone to edit this document
-            <input
-              type="checkbox"
-              checked={isEditable === null ? false : isEditable}
-              onChange={handleCheckboxChange}
-            />
-          </label> */}
       {loading ? (
         <div className="container">
-          <h5 style={{
-            margin:"1rem"
-          }}>Generating....</h5>
+          <h5
+            style={{
+              margin: "1rem",
+            }}
+          >
+            Generating....
+          </h5>
         </div>
       ) : (
         <div className="container" ref={wrapperRef}></div>

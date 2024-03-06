@@ -151,6 +151,16 @@ a{
     margin-left: 5rem;
 }
 
+.nav2{
+    width: 22vw;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    margin-left: 5rem;
+    gap:1rem;
+    color: #fff;
+}
+
 .textModal{
     width: 60vw;
     height: 20vh;

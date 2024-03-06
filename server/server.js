@@ -34,16 +34,17 @@ io.on("connection", (socket) => {
         _id: documentId,
         data: {},
         owner: username,
-        isEditable: isEditable
+        isEditable: isEditable,
       });
-    }
+    } 
+
     socket.join(documentId);
     socket.emit("load-document", {
       data: document.data,
       owner: document.owner,
       isEditable: document.isEditable
     });
-
+    
     socket.on("send-changes", async (delta, username) => {
       socket.broadcast.to(documentId).emit("receive-changes", delta);
     });

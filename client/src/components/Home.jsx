@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import "./home.css";
+import { usePermission } from "../context/PermissionContext";
 
 function generateRoomId() {
   const characters =
@@ -16,6 +17,14 @@ const Home = () => {
   const [code, setCode] = useState("");
   const navigate = useNavigate();
 
+  const { permission, togglePermission } = usePermission();
+
+
+  function handleCheckboxChange(event) {
+      togglePermission(event.target.checked);
+    }
+
+    console.log(permission);
   const redirect = () => {
     navigate(`/documents/${generateRoomId()}`);
   };
@@ -77,6 +86,14 @@ const Home = () => {
             <button onClick={redirect} className="btn2">
               Create
             </button>
+            <div className="nav2">
+              <input
+                type="checkbox"
+                checked={permission === false ? false : true}
+                onChange={handleCheckboxChange}
+                />
+                <label>Allow everyone to edit this document</label>
+        </div>
           </div>
         </div>
       </div>
