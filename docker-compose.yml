@@ -1,0 +1,21 @@
+version: '3'
+services:
+ frontend:
+    build: ./client
+    ports:
+      - "8080:80"
+    volumes:
+      - ./client:/app
+ backend:
+    build: ./server
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./server:/app
+    depends_on:
+      - db
+ db:
+    image: mongo:4.4
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: divyparekh1810
+      MONGO_INITDB_ROOT_PASSWORD: divyparekh1810

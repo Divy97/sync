@@ -6,6 +6,7 @@ import { io } from "socket.io-client";
 import { useNavigate, useParams } from "react-router-dom";
 import { usePermission } from "../context/PermissionContext";
 
+
 const SAVE_INTERVAL_MS = 2000;
 
 export default function TextEditor() {
@@ -115,9 +116,6 @@ export default function TextEditor() {
     if (socket == null || quill == null) return;
 
     const handler = (generatedText) => {
-      // const range = quill.getSelection();
-      // if (range && range.length === 0) {
-      // }
       console.log("cursor", cursor);
       quill.insertText(cursor, generatedText);
     };
@@ -144,12 +142,13 @@ export default function TextEditor() {
   const writePrompt = () => {
     setTextModal(!textModal);
   };
-
+  
   const [text, setText] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const apiCall = async () => {
     quill.enable(false);
-    // setLoading(true)
+    setLoading(true)
     try {
       const response = await fetch("http://localhost:3001/generate-text", {
         method: "POST",
@@ -171,36 +170,11 @@ export default function TextEditor() {
       setText("");
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false)
     }
-    // setLoading(false)
     quill.enable(true);
   };
-
-  const [loading, setLoading] = useState(false);
-
-  // const navigate = useNavigate();
-  // function handleCheckboxChange(event) {
-  //   setIsEditable(event.target.checked);
-  // }
-
-  // useEffect(() => {
-  //   if (socket == null || quill == null) return;
-
-  //   const handleEditableChange = (isEditable) => {
-  //     setIsEditable(isEditable);
-  //     if (isEditable || username === owner) {
-  //       quill.enable();
-  //     } else {
-  //       quill.disable();
-  //     }
-  //   };
-
-  //   socket.on("editable-change", handleEditableChange);
-
-  //   return () => {
-  //     socket.off("editable-change", handleEditableChange);
-  //   };
-  // }, [socket, quill, username, owner, isEditable]);
 
   const navigate = useNavigate();
 
@@ -215,21 +189,12 @@ export default function TextEditor() {
       <div className="nav">
         <h3>Room code: {documentId}</h3>
         {(permission || username === owner) && (
-          <button onClick={writePrompt} className="btn2">
+         !loading ? <button onClick={writePrompt} className="btn2">
             Help me write
-          </button>
+          </button> : <h5>Loading...</h5>
+          
         )}
       </div>
-      {/* {username === owner && (
-        <div className="nav2">
-          <label>Allow everyone to edit this document</label>
-          <input
-            type="checkbox"
-            checked={isEditable === null ? false : isEditable}
-            onChange={handleCheckboxChange}
-          />
-        </div>
-      )} */}
       {textModal && (
         <div className="textModal">
           <input
@@ -244,19 +209,7 @@ export default function TextEditor() {
           </button>
         </div>
       )}
-      {loading ? (
-        <div className="container">
-          <h5
-            style={{
-              margin: "1rem",
-            }}
-          >
-            Generating....
-          </h5>
-        </div>
-      ) : (
         <div className="container" ref={wrapperRef}></div>
-      )}
     </div>
   );
 }
