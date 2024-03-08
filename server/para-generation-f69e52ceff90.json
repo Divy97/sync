@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "para-generation",
+  "private_key_id": "f69e52ceff904684bf3f217c8560c8dff6edc3ff",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDMOjDChUl0qdsq\nVL7LCMBU9yqJUj4fjr5RKWOTCxEjkXcGKvE+fiu9TCEArOdDYG2vOXYYRDLnxNOx\nPKJgJqPFjzMN/kpMHjmcSLu+w3iTu4UnwYjl7HzGLOwWtbradO+p0CzsHrgiRWE2\nW3vVGv49PVUoOBWBxcXfz7BIeZUN0jZb9aTnH3Q+QdfKDH2x21KKXoFfdfZGaYXo\niZZBdJJ66jGb93j07sNTxa2JCAUIA3jm6Qq7p5MubDgwLKmrTEyqE5zS7ocbx5cW\njaq8MSFN153K8e3lMTMdi8aLNAILx8yUstm/7Bs7RJEmAK9IcQZ+LHayg0I98+K+\nKzfBu+tdAgMBAAECggEAMk8WYmDDqNvL28hvDKR9/qA5iATsvUjkXKl5uEgWY4Dq\nxWfwMEEUBMh7a8dsG9amBm99BjrMoHgF3wgNBusV1m2xeb297zTV48guCa7s5dWg\nllvQXbVtQkNgMDL50eVTAa3A1zS1Duow6ZtNLMC+xva0Itl4ANUnqrvmlN/whivk\nw5Wx7CghkDVfCcgjCogzqTacCvzbkHZkiPNqQ214gjMnZlpEXsCGrdaKrF986/kx\n4D9q+t+GLoNWGWobp7IoS1egvQDhjXze4dK12hNHs4odvKO0BEaq2i2cnfgWi8Ty\nvBqvde8DVh9mSHK9SnNdnm1pXEXNaWQyBlVwjdS1GQKBgQD4RmGiSkJpEKoJxRXi\ncktyuS8CHl2rJCaF7YYBTjqGcajTNx/2B33vmWnCBg1qG0L8aObM1BaF69TTgFkc\nrFB2MMRsCU/UawpNS7h/nlGJLG8T3heg7CI25XN16yCMmPf68hK7BZJYOhHf47Fo\nUFPYVCLxDqU8nOxf03YO2XhfWQKBgQDSlPNSojjnakNXoNjch28kbYwpW+88Hbkr\nq00rw9KHgRineZWL7RLeBXZhl6lwsbTUbafONfzOtBmIwfKbDWyvP11v1UTb67eH\nviE2SI/7y3thZwc4n+pPUQDEOtFQm17HKCmuyoyMLEAGlY4IGNQbJJwRdu0ED2B0\ncV7CskpPpQKBgAl0pMNJkL3vpIo6t1qof7ce1mt+PJMIDW+MXE4wbIoySfvBXbZB\nEsrNTPnWwSwJXcO/OwsSCMmQ8cocWUh+R5I4yUJUGHY+nWXUPHKf1PskdhaLntrC\nI4tzsbIMAnFYYhlsnsoArFIv4/5i7Z7LcGYMzkfgBusIDviXVSe7oJoBAoGAPL68\n5hRnp9HOdUOv6wWiePak3PVpMIU+eitjCoHlhDMoQn9fNUsBC0y2FnbiaODKUhED\nvAd00se/KeUQr8uSk4cK1AzIXUxE2AJvoDIUXsUW5UUMHzh6JcEvIGv7H26CS575\nTzOckX7eRUf0/b7zyJSp9JvCyU4KO+zMMguuRgUCgYEAxMDRkz6H3ncejodPnrzo\nV6AYHl3H54tgOPeq9R2WPX0r6artaCMAfeRZeoWZahSs6fB5caB1jnk8v+oM1d7+\ndU4i44dzd7jam1klzrTQmTdfWNE0W248nqXs9GDoBbWLQVbM/6IRuSiKJOnzX6zu\nx31n31wfGBYNkgCV+s+xFdU=\n-----END PRIVATE KEY-----\n",
+  "client_email": "para-generation@para-generation.iam.gserviceaccount.com",
+  "client_id": "105579202828606173523",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/para-generation%40para-generation.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

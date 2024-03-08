@@ -37,7 +37,9 @@ export default function TextEditor() {
   };
 
   useEffect(() => {
-    const s = io("http://localhost:3001");
+    const s = io("http://3.109.155.234:3001", {
+      transports: ["websocket"],
+    });
     setSocket(s);
 
     return () => {
@@ -150,7 +152,7 @@ export default function TextEditor() {
     quill.enable(false);
     setLoading(true)
     try {
-      const response = await fetch("http://localhost:3001/generate-text", {
+      const response = await fetch("http://3.109.155.234:3001/generate-text", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
